@@ -35,7 +35,11 @@
     <section id="inicio" class="inicio">
         <div class="contenido-banner">
             <div class="contenedor-img">
-                <img src="img/yo.jpg" alt="">
+                <picture>
+                    <source srcset="img/yo.webp" type="image/webp">
+                    <source srcset="img/yo.jpg" type="image/jpeg">
+                    <img loading="lazy" src="img/yo.jpg" alt="yo">
+                </picture>
             </div>
             <h1>Felipe Hevia</h1>
             <h2>Ingeniero Informático</h2>
@@ -309,7 +313,7 @@
                 </a>
                 </div>
                 <div class="proyecto">
-                    <img src="img/movies.png" alt="" style="height: 400px; width: 250px; border-radius: 5%;">
+                    <img src="img/movies.png" alt="" style="height: 450px; width: 250px; border-radius: 3%;">
                     <a href="https://github.com/heviahxc/peliculas" target="_blank"><div class="overlay">
                         <h3>Dart/Flutter</h3>
                         <p>App Movies</p>
