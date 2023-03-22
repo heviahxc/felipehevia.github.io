@@ -294,7 +294,7 @@ html{
 }
 @keyframes nodejs {
     0%{width: 0%;}
-    100%{width: 50%;}
+    100%{width: 80%;}
 }
 
 .skills .skill .mongodb{
