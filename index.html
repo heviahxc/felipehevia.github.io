@@ -1,463 +1,833 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.2/css/all.min.css" integrity="sha512-1sCRPdkRXhBV2PBLUdRb4tMg1w2YPf37qatUFeS7zlBy7jJI8Lf4VHwWfZZfpXtYSLy85pkm9GaYVYMfw5BC1A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
-    <title>Felipe Hevia</title>
-    <link rel="stylesheet" href="style.css">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-KK94CHFLLe+nY2dmCWGMq91rCGa5gtU4mk92HdvYe+M/SXH301p5ILy+dN9+nJOZ" crossorigin="anonymous">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Felipe Hevia — Ingeniero Informático</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" />
+  <style>
+    /* ─── Design Tokens ─── */
+    :root {
+      --bg:       #07090f;
+      --bg2:      #0d1117;
+      --bg3:      #111827;
+      --card:     rgba(255,255,255,0.04);
+      --cardh:    rgba(255,255,255,0.07);
+      --border:   rgba(255,255,255,0.08);
+      --blue:     #4f9cf9;
+      --purple:   #a78bfa;
+      --grad:     linear-gradient(135deg, #4f9cf9 0%, #a78bfa 100%);
+      --glow:     0 0 40px rgba(79,156,249,0.25);
+      --t1:       #f0f4ff;
+      --t2:       #8892a4;
+      --radius:   14px;
+      --trans:    0.3s ease;
+    }
+
+    /* ─── Reset & Base ─── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      background: var(--bg);
+      color: var(--t1);
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      line-height: 1.6;
+      overflow-x: hidden;
+    }
+    a { color: inherit; text-decoration: none; }
+    ul { list-style: none; }
+    img { max-width: 100%; display: block; }
+
+    /* ─── Background Grid Pattern ─── */
+    body::before {
+      content: '';
+      position: fixed; inset: 0;
+      background-image:
+        linear-gradient(rgba(79,156,249,0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(79,156,249,0.03) 1px, transparent 1px);
+      background-size: 60px 60px;
+      pointer-events: none; z-index: 0;
+    }
+
+    /* ─── Orbs (ambient glow) ─── */
+    .orb {
+      position: fixed; border-radius: 50%;
+      filter: blur(80px); pointer-events: none; z-index: 0;
+    }
+    .orb-1 { width: 500px; height: 500px; background: rgba(79,156,249,0.07); top:-150px; left:-150px; }
+    .orb-2 { width: 400px; height: 400px; background: rgba(167,139,250,0.07); bottom:0; right:-100px; }
+
+    /* ─── Navbar ─── */
+    .navbar {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      padding: 0 5%;
+      height: 70px;
+      display: flex; align-items: center; justify-content: space-between;
+      background: rgba(7,9,15,0.7);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border);
+      transition: var(--trans);
+    }
+    .navbar.scrolled { background: rgba(7,9,15,0.95); box-shadow: var(--glow); }
+
+    .logo {
+      font-size: 1.4rem; font-weight: 800; letter-spacing: -0.5px;
+      background: var(--grad); -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    }
+
+    .nav-links { display: flex; gap: 2rem; }
+    .nav-links a {
+      font-size: 0.85rem; font-weight: 500; letter-spacing: 0.8px;
+      text-transform: uppercase; color: var(--t2);
+      transition: color var(--trans); position: relative;
+    }
+    .nav-links a::after {
+      content: ''; position: absolute; bottom: -4px; left: 0;
+      width: 0; height: 2px;
+      background: var(--grad); border-radius: 2px;
+      transition: width var(--trans);
+    }
+    .nav-links a:hover { color: var(--t1); }
+    .nav-links a:hover::after { width: 100%; }
+
+    .hamburger { display: none; font-size: 1.4rem; cursor: pointer; color: var(--t1); }
+
+    /* ─── Section Base ─── */
+    section { position: relative; z-index: 1; padding: 100px 5%; }
+    .section-title {
+      text-align: center; margin-bottom: 60px;
+    }
+    .section-title h2 {
+      font-size: clamp(2rem, 4vw, 2.8rem); font-weight: 800; letter-spacing: -1px;
+      background: var(--grad); -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    }
+    .section-title .subtitle {
+      color: var(--t2); margin-top: 10px; font-size: 1rem;
+    }
+    .title-line {
+      width: 60px; height: 3px;
+      background: var(--grad); border-radius: 2px;
+      margin: 16px auto 0;
+    }
+
+    /* ─── Hero ─── */
+    #inicio {
+      min-height: 100vh;
+      display: flex; align-items: center; justify-content: center;
+      padding-top: 70px; text-align: center;
+    }
+    .hero-inner { max-width: 700px; }
+
+    .hero-avatar {
+      width: 160px; height: 160px; border-radius: 50%;
+      margin: 0 auto 30px;
+      position: relative;
+      padding: 4px;
+      background: var(--grad);
+      box-shadow: 0 0 50px rgba(79,156,249,0.35);
+    }
+    .hero-avatar img {
+      width: 100%; height: 100%; border-radius: 50%;
+      object-fit: cover;
+      border: 3px solid var(--bg);
+    }
+    .hero-avatar .status {
+      position: absolute; bottom: 10px; right: 10px;
+      width: 18px; height: 18px; border-radius: 50%;
+      background: #22c55e; border: 3px solid var(--bg);
+      animation: pulse-green 2s infinite;
+    }
+    @keyframes pulse-green {
+      0%,100% { box-shadow: 0 0 0 0 rgba(34,197,94,0.4); }
+      50%      { box-shadow: 0 0 0 8px rgba(34,197,94,0); }
+    }
+
+    .hero-badge {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 6px 16px; border-radius: 30px;
+      border: 1px solid rgba(79,156,249,0.3);
+      background: rgba(79,156,249,0.08);
+      color: var(--blue); font-size: 0.82rem; font-weight: 500;
+      margin-bottom: 24px; letter-spacing: 0.5px;
+    }
+    .hero-badge i { font-size: 0.7rem; }
+
+    .hero-name {
+      font-size: clamp(2.8rem, 6vw, 4.5rem);
+      font-weight: 900; letter-spacing: -2px; line-height: 1;
+      background: linear-gradient(135deg, #fff 0%, var(--purple) 100%);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      margin-bottom: 14px;
+    }
+
+    .hero-title {
+      font-size: clamp(1rem, 2vw, 1.25rem); color: var(--t2);
+      font-weight: 400; margin-bottom: 30px;
+    }
+    .hero-title span { color: var(--blue); font-weight: 600; }
+
+    .hero-socials { display: flex; justify-content: center; gap: 16px; margin-bottom: 36px; }
+    .hero-socials a {
+      width: 46px; height: 46px; border-radius: 12px;
+      border: 1px solid var(--border);
+      background: var(--card);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.1rem; color: var(--t2);
+      transition: all var(--trans);
+    }
+    .hero-socials a:hover {
+      border-color: var(--blue); color: var(--blue);
+      background: rgba(79,156,249,0.1);
+      transform: translateY(-3px); box-shadow: var(--glow);
+    }
+
+    .hero-btns { display: flex; justify-content: center; gap: 14px; flex-wrap: wrap; }
+    .btn {
+      padding: 13px 28px; border-radius: 12px;
+      font-weight: 600; font-size: 0.9rem; cursor: pointer;
+      transition: all var(--trans); border: none; letter-spacing: 0.3px;
+    }
+    .btn-primary {
+      background: var(--grad); color: #fff;
+      box-shadow: 0 4px 20px rgba(79,156,249,0.35);
+    }
+    .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 30px rgba(79,156,249,0.5); }
+    .btn-outline {
+      background: var(--card); color: var(--t1);
+      border: 1px solid var(--border);
+    }
+    .btn-outline:hover {
+      border-color: var(--blue); color: var(--blue);
+      background: rgba(79,156,249,0.08); transform: translateY(-2px);
+    }
+
+    /* ─── Sobre Mí ─── */
+    #sobremi { background: var(--bg2); }
+
+    .about-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 30px; max-width: 1100px; margin: 0 auto;
+    }
+    .about-card {
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 32px;
+      transition: all var(--trans);
+    }
+    .about-card:hover { background: var(--cardh); border-color: rgba(79,156,249,0.2); }
+    .about-card h3 {
+      font-size: 1rem; font-weight: 700; letter-spacing: 1px;
+      text-transform: uppercase; color: var(--blue);
+      margin-bottom: 20px; display: flex; align-items: center; gap: 8px;
+    }
+
+    .about-intro { grid-column: 1 / -1; }
+    .about-intro p { color: var(--t2); line-height: 1.8; font-size: 1.05rem; }
+    .about-intro p span { color: var(--blue); font-weight: 600; }
+
+    .data-list { display: flex; flex-direction: column; gap: 14px; }
+    .data-item {
+      display: flex; gap: 12px; align-items: flex-start;
+      padding-bottom: 14px; border-bottom: 1px solid var(--border);
+    }
+    .data-item:last-child { border-bottom: none; padding-bottom: 0; }
+    .data-label { color: var(--t2); font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.8px; min-width: 80px; margin-top: 2px; }
+    .data-val { color: var(--t1); font-size: 0.95rem; }
+    .data-val a { color: var(--blue); }
+
+    .interests-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+    .interest-item {
+      display: flex; flex-direction: column; align-items: center; gap: 8px;
+      padding: 16px 8px; border-radius: 10px;
+      border: 1px solid var(--border); background: rgba(255,255,255,0.02);
+      transition: all var(--trans); cursor: default;
+    }
+    .interest-item:hover {
+      border-color: rgba(167,139,250,0.4); background: rgba(167,139,250,0.08);
+      transform: translateY(-3px);
+    }
+    .interest-item i { font-size: 1.3rem; color: var(--purple); }
+    .interest-item span { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.8px; color: var(--t2); }
+
+    /* ─── Skills ─── */
+    #skills { background: var(--bg); }
+
+    .skills-grid {
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 30px; max-width: 1000px; margin: 0 auto;
+    }
+    .skills-card {
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 32px;
+    }
+    .skills-card h3 {
+      font-size: 1rem; font-weight: 700; letter-spacing: 1px;
+      text-transform: uppercase; color: var(--blue);
+      margin-bottom: 28px; display: flex; align-items: center; gap: 8px;
+    }
+
+    .skill-item { margin-bottom: 22px; }
+    .skill-item:last-child { margin-bottom: 0; }
+    .skill-header { display: flex; justify-content: space-between; margin-bottom: 8px; }
+    .skill-name { font-size: 0.9rem; font-weight: 600; color: var(--t1); }
+    .skill-pct { font-size: 0.8rem; color: var(--blue); font-weight: 700; }
+
+    .skill-track {
+      height: 6px; background: rgba(255,255,255,0.08);
+      border-radius: 6px; overflow: hidden;
+    }
+    .skill-fill {
+      height: 100%; border-radius: 6px;
+      background: var(--grad);
+      width: 0; transition: width 1.2s cubic-bezier(0.4,0,0.2,1);
+    }
+
+    /* ─── Curriculum / Timeline ─── */
+    #curriculum { background: var(--bg2); }
+
+    .timeline-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; max-width: 1100px; margin: 0 auto; }
+    .timeline-col h3 {
+      font-size: 1rem; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 1px; color: var(--t2); margin-bottom: 28px;
+      display: flex; align-items: center; gap: 10px;
+    }
+    .timeline-col h3 i { color: var(--blue); }
+
+    .timeline { position: relative; padding-left: 28px; }
+    .timeline::before {
+      content: ''; position: absolute;
+      left: 7px; top: 0; bottom: 0; width: 2px;
+      background: linear-gradient(to bottom, var(--blue), var(--purple), transparent);
+    }
+
+    .tl-item {
+      position: relative; margin-bottom: 30px;
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 22px 24px;
+      transition: all var(--trans);
+    }
+    .tl-item:hover { background: var(--cardh); border-color: rgba(79,156,249,0.2); transform: translateX(4px); }
+    .tl-item::before {
+      content: ''; position: absolute;
+      left: -32px; top: 24px;
+      width: 14px; height: 14px; border-radius: 50%;
+      background: var(--grad); border: 2px solid var(--bg2);
+      box-shadow: 0 0 10px rgba(79,156,249,0.5);
+    }
+
+    .tl-date {
+      font-size: 0.75rem; font-weight: 600; letter-spacing: 0.8px;
+      text-transform: uppercase; color: var(--blue);
+      margin-bottom: 6px;
+      display: flex; align-items: center; gap: 6px;
+    }
+    .tl-title { font-size: 1.05rem; font-weight: 700; color: var(--t1); margin-bottom: 4px; }
+    .tl-company { font-size: 0.85rem; color: var(--purple); font-weight: 600; margin-bottom: 10px; }
+    .tl-desc { font-size: 0.88rem; color: var(--t2); line-height: 1.7; }
+    .tl-tags { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+    .tag {
+      padding: 3px 10px; border-radius: 20px; font-size: 0.75rem; font-weight: 600;
+      border: 1px solid rgba(79,156,249,0.3);
+      background: rgba(79,156,249,0.08); color: var(--blue);
+    }
+    .tl-list { margin-top: 10px; padding-left: 0; display: flex; flex-direction: column; gap: 5px; }
+    .tl-list li {
+      font-size: 0.85rem; color: var(--t2);
+      display: flex; align-items: flex-start; gap: 8px;
+    }
+    .tl-list li::before {
+      content: '▸'; color: var(--blue); flex-shrink: 0; margin-top: 1px;
+    }
+
+    /* ─── Portfolio ─── */
+    #portfolio { background: var(--bg); }
+
+    .portfolio-tabs {
+      display: flex; justify-content: center; gap: 10px;
+      margin-bottom: 40px; flex-wrap: wrap;
+    }
+    .tab-btn {
+      padding: 8px 24px; border-radius: 30px;
+      border: 1px solid var(--border); background: var(--card);
+      color: var(--t2); font-size: 0.85rem; font-weight: 600;
+      cursor: pointer; transition: all var(--trans);
+    }
+    .tab-btn.active, .tab-btn:hover {
+      background: var(--grad); border-color: transparent; color: #fff;
+    }
+
+    .portfolio-grid {
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(280px,1fr));
+      gap: 24px; max-width: 1100px; margin: 0 auto;
+    }
+    .port-card {
+      border-radius: var(--radius); overflow: hidden;
+      border: 1px solid var(--border); background: var(--card);
+      transition: all var(--trans); position: relative;
+    }
+    .port-card:hover { transform: translateY(-6px); box-shadow: 0 20px 40px rgba(0,0,0,0.4), var(--glow); border-color: rgba(79,156,249,0.25); }
+
+    .port-img {
+      position: relative; height: 200px; overflow: hidden;
+      background: var(--bg3);
+    }
+    .port-img img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.5s ease; }
+    .port-card:hover .port-img img { transform: scale(1.06); }
+    .port-overlay {
+      position: absolute; inset: 0;
+      background: linear-gradient(to top, rgba(7,9,15,0.95), rgba(7,9,15,0.3));
+      display: flex; align-items: flex-end; padding: 20px;
+      opacity: 0; transition: opacity var(--trans);
+    }
+    .port-card:hover .port-overlay { opacity: 1; }
+    .port-overlay a {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 8px 18px; border-radius: 8px;
+      background: var(--grad); color: #fff;
+      font-size: 0.82rem; font-weight: 600;
+    }
+
+    .port-body { padding: 20px; }
+    .port-tech {
+      display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 10px;
+    }
+    .port-tech span {
+      font-size: 0.72rem; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.5px; color: var(--purple);
+      background: rgba(167,139,250,0.1); border: 1px solid rgba(167,139,250,0.2);
+      padding: 2px 8px; border-radius: 4px;
+    }
+    .port-title { font-size: 1rem; font-weight: 700; color: var(--t1); margin-bottom: 6px; }
+    .port-desc { font-size: 0.83rem; color: var(--t2); line-height: 1.5; }
+
+    .port-type {
+      display: none; position: absolute; top: 12px; right: 12px;
+      padding: 3px 10px; border-radius: 20px; font-size: 0.72rem; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 0.5px;
+    }
+    .type-web { background: rgba(79,156,249,0.15); color: var(--blue); border: 1px solid rgba(79,156,249,0.3); }
+    .type-movil { background: rgba(167,139,250,0.15); color: var(--purple); border: 1px solid rgba(167,139,250,0.3); }
+
+    /* ─── Footer ─── */
+    footer {
+      position: relative; z-index: 1;
+      background: var(--bg2);
+      border-top: 1px solid var(--border);
+      padding: 40px 5%;
+      display: flex; justify-content: space-between; align-items: center;
+      flex-wrap: wrap; gap: 20px;
+    }
+    .footer-copy { color: var(--t2); font-size: 0.85rem; }
+    .footer-copy span { color: var(--blue); }
+    .footer-socials { display: flex; gap: 12px; }
+    .footer-socials a {
+      width: 40px; height: 40px; border-radius: 10px;
+      border: 1px solid var(--border); background: var(--card);
+      display: flex; align-items: center; justify-content: center;
+      color: var(--t2); transition: all var(--trans);
+    }
+    .footer-socials a:hover {
+      color: var(--blue); border-color: var(--blue);
+      background: rgba(79,156,249,0.1);
+    }
+    .scroll-top {
+      position: fixed; bottom: 28px; right: 28px; z-index: 200;
+      width: 44px; height: 44px; border-radius: 12px;
+      background: var(--grad); color: #fff;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1rem; cursor: pointer;
+      box-shadow: 0 4px 20px rgba(79,156,249,0.4);
+      opacity: 0; pointer-events: none; transition: all var(--trans);
+    }
+    .scroll-top.visible { opacity: 1; pointer-events: all; }
+    .scroll-top:hover { transform: translateY(-3px); box-shadow: 0 8px 30px rgba(79,156,249,0.6); }
+
+    /* ─── Reveal animation ─── */
+    .reveal { opacity: 0; transform: translateY(28px); transition: opacity 0.7s ease, transform 0.7s ease; }
+    .reveal.visible { opacity: 1; transform: translateY(0); }
+
+    /* ─── Responsive ─── */
+    @media (max-width: 768px) {
+      .nav-links { display: none; flex-direction: column; position: absolute; top: 70px; left: 0; right: 0; background: rgba(7,9,15,0.97); border-bottom: 1px solid var(--border); padding: 20px 5%; gap: 16px; }
+      .nav-links.open { display: flex; }
+      .hamburger { display: block; }
+      .about-grid { grid-template-columns: 1fr; }
+      .about-intro { grid-column: 1; }
+      .interests-grid { grid-template-columns: repeat(4,1fr); }
+      .skills-grid { grid-template-columns: 1fr; }
+      .timeline-cols { grid-template-columns: 1fr; }
+      footer { justify-content: center; text-align: center; }
+    }
+    @media (max-width: 480px) {
+      section { padding: 80px 4%; }
+      .interests-grid { grid-template-columns: repeat(4,1fr); gap: 8px; }
+    }
+  </style>
 </head>
 <body>
-    <!-- MENU ENCABEZADO -->
-    <div class="contenedor-header">
-        <header>
-            <div class="logo">
-                <a href="#">FH</a>
-            </div>
-            <nav id="nav">
-                <ul>
-                    <li><a href="#inicio" onclick="seleccionar()">INICIO</a></li>
-                    <li><a href="#sobremi" onclick="seleccionar()">SOBRE MI</a></li>
-                    <li><a href="#skills" onclick="seleccionar()">SKILLS</a></li>
-                    <li><a href="#curriculum" onclick="seleccionar()">CURRICULUM</a></li>
-                    <li><a href="#portfolio" onclick="seleccionar()">PORTFOLIO</a>
-                        <ul class="submenu">
-                            <li><a href="#web" onclick="seleccionar()">Web</a></li>
-                            <li><a href="#movil" onclick="seleccionar()">Movil</a></li>
-                        
-                          </ul>
-                    </li>
-                   <!-- <li><a href="#contacto" onclick="seleccionar()">CONTACTO</a></li>-->
-                </ul>
-            </nav>
-            <div class="nav-responsive" onclick="mostrarOcultarMenu()">
-                <i class="fa-solid fa-bars"></i>
-            </div>
-        </header>
-    </div>
 
-    <!-- SECCION INICIO -->
-    <section id="inicio" class="inicio">
-        <div class="contenido-banner">
-            <div class="contenedor-img">
-                <picture>
-                    <source srcset="img/yo.webp" type="image/webp">
-                    <source srcset="img/yo.jpg" type="image/jpeg">
-                    <img loading="lazy" src="img/yo.jpg" alt="yo">
-                </picture>
-            </div>
-            <h1>Felipe Hevia</h1>
-            <h2>Ingeniero Informático</h2>
-            <div class="redes">
-                <a href="https://www.linkedin.com/in/felipe-hevia-611038211" target="_blank"><i class="fa-brands fa-linkedin-in"></i></a>
-                <a href="https://github.com/heviahxc" target="_blank"><i class="fa-brands fa-github"></i></a>
-            </div>
-        </div>
-    </section>
+  <!-- Ambient orbs -->
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
 
-    <!-- SECCION SOBRE MI -->
-    <section id="sobremi" class="sobremi">
-        <div class="contenido-seccion">
-            <h2>Sobre Mí</h2>
-            <p><span>Hola, soy Felipe Hevia.</span> Ingeniero Informático titulado de la Universidad Católica del Maule, Chile. Tengo 24 años y programo desde los 16 cuando estudie Técnico en el Liceo Comercial Linares.</p>
+  <!-- ── NAVBAR ── -->
+  <nav class="navbar" id="navbar">
+    <div class="logo">FH</div>
+    <ul class="nav-links" id="navLinks">
+      <li><a href="#inicio" onclick="closeMenu()">Inicio</a></li>
+      <li><a href="#sobremi" onclick="closeMenu()">Sobre Mí</a></li>
+      <li><a href="#skills" onclick="closeMenu()">Skills</a></li>
+      <li><a href="#curriculum" onclick="closeMenu()">Curriculum</a></li>
+      <li><a href="#portfolio" onclick="closeMenu()">Portfolio</a></li>
+    </ul>
+    <div class="hamburger" onclick="toggleMenu()"><i class="fa-solid fa-bars"></i></div>
+  </nav>
 
-            <div class="fila">
-                <!-- datos personales -->
-                <div class="col">
-                    <h3>Datos Personales</h3>
-                    <ul>
-                
-                        <li>
-                            <strong>Teléfono</strong>
-                            +569 9680 7573
-                        </li>
-                        <li>
-                            <strong>Email</strong>
-                            heviamc@gmail.com
-                        </li>
-                        <li>
-                            <strong>Dirección</strong>
-                            Linares, Chile
-                        </li>
-                        <li>
-                            <strong>Cargo</strong>
-                            <span>FREELANCE</span>
-                        </li>
-                    </ul>
-                </div>
-
-                <!-- intereses -->
-                <div class="col">
-                    <h3>Interéses</h3>
-                    <div class="contenedor-intereses">
-                        <div class="interes">
-                            <i class="fa-solid fa-gamepad"></i>
-                            <span>JUEGOS</span>
-                        </div>
-                        <div class="interes">
-                            <i class="fa-solid fa-headphones"></i>
-                            <span>MUSICA</span>
-                        </div>
-                        <div class="interes">
-                            <i class="fa-solid fa-plane"></i>
-                            <span>VIAJAR</span>
-                        </div>
-                        <div class="interes">
-                            <i class="fa-solid fa-video"></i>
-                            <span>PELICULAS</span>
-                        </div>
-                        <div class="interes">
-                            <i class="fa-solid fa-person-hiking"></i>
-                            <span>DEPORTE</span>
-                        </div>
-                        <div class="interes">
-                            <i class="fa-solid fa-book"></i>
-                            <span>LIBROS</span>
-                        </div>
-                        <div class="interes">
-                            <i class="fa-solid fa-car"></i>
-                            <span>AUTOS</span>
-                        </div>
-                        <div class="interes">
-                            <i class="fa-solid fa-camera"></i>
-                            <span>FOTOS</span>
-                        </div>
-                        
-                    </div>
-                </div>
-            </div>
-            <button id="download-button">
-                Descargar CV <i class="fa-solid fa-download"></i>
-                <span class="overlay"></span>
-            </button>
-        
-        </div>
-    </section>
-
-    <!-- SECCION SKILLS -->
-    <section class="skills" id="skills">
-        <div class="contenido-seccion">
-            <h2>Skills</h2>
-            <div class="fila">
-                <!-- Technical Skill -->
-                <div class="col">
-                    <h3>Technical Skills</h3>
-                    <div class="skill">
-                        <span>Flutter</span>
-                        <div class="barra-skill">
-                            <div class="progreso">
-                                <span>50%</span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="skill">
-                        <span>HTML & CSS</span>
-                        <div class="barra-skill">
-                            <div class="progreso">
-                                <span>80%</span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="skill">
-                        <span>Node.js</span>
-                        <div class="barra-skill">
-                            <div class="progreso">
-                                <span>80%</span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="skill">
-                        <span>MySQL</span>
-                        <div class="barra-skill">
-                            <div class="progreso">
-                                <span>70%</span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="skill">
-                        <span>Angular</span>
-                        <div class="barra-skill">
-                            <div class="progreso">
-                                <span>40%</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <!-- Professional Skills -->
-                <div class="col">
-                    <h3>Professional Skills</h3>
-                    <div class="skill">
-                        <span>Comunicación</span>
-                        <div class="barra-skill">
-                            <div class="progreso">
-                                <span>80%</span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="skill">
-                        <span>Trabajo en Equipo</span>
-                        <div class="barra-skill">
-                            <div class="progreso">
-                                <span>90%</span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="skill">
-                        <span>Creatividad</span>
-                        <div class="barra-skill">
-                            <div class="progreso">
-                                <span>80%</span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="skill">
-                        <span>Dedicación</span>
-                        <div class="barra-skill">
-                            <div class="progreso">
-                                <span>80%</span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="skill">
-                        <span>Proyect Management</span>
-                        <div class="barra-skill">
-                            <div class="progreso">
-                                <span>70%</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- SECCION CURRICULUM -->
-    <section id="curriculum" class="curriculum">
-        <div class="contenido-seccion">
-            <h2>Curriculum</h2>
-            <div class="fila">
-                <div class="col izquierda">
-                    <h3>Educación</h3>
-                    <div class="item izq">
-                        <h4>Analista Programador</h4>
-                        <span class="casa">CFT San Agustin</span>
-                        <span class="fecha">2017 - 2019</span>
-                        <p>Portafolio de título realizado en Java (Aplicacion de escritorio), fue un software de manejo de invetario y prestamo de herramientas para la carrera de Técnico en Obras Civiles.</p>
-                        <div class="conectori">
-                            <div class="circuloi"></div>
-                        </div>
-                    </div>
-                    <div class="item izq">
-                        <h4>Ingeniería en Informática</h4>
-                        <span class="casa">Universidad Católica del Maule</span>
-                        <span class="fecha">2019 - 2021</span>
-                        <p>Tesis realizada en Matlab, consistía en un software que procesára imagenes, simulando la reducción de ruido y blurring, efectuando una comparación de métodos de reducción por medio del SNR (valor que nos permite de manera matemática establecer la calidad de una imagen).</p>
-                        <div class="conectori">
-                            <div class="circuloi"></div>
-                        </div>
-                    </div>
-                    <!--
-                    <div class="item izq">
-                        <h4>Arte y Multimedia</h4>
-                        <span class="casa">Universidad de Oxford</span>
-                        <span class="fecha">2005 - 2008</span>
-                        <p>Lorem ipsum dolor sit amet consectetur, adipisicing elit. Quis, cumque repellat, tempora recusandae aliquam nemo esse natus impedit, nostrum temporibus veritatis eaque soluta aperiam id repudiandae fugiat deserunt! Explicabo, veritatis?</p>
-                        <div class="conectori">
-                            <div class="circuloi"></div>
-                        </div>
-                    </div>
-                      -->
-                </div>
-              
-                <div class="col derecha">
-                    <h3>Experiencia de trabajo</h3>
-                    <div class="item der">
-                        <h4>Desarrollador Mobile</h4>
-                        <span class="casa">Grupo Firma</span>
-                        <span class="fecha">Sept/2022 - Actual</span>
-                        <p>Desarrollo en Android e ios utilizando Flutter, Nodejs y MongoDB, manejo de mapas utilizando OpenStreetMap.</p>
-                        <br>
-                        <ul>
-                            <li>Control de sesión de usuarios (Manejo de tokens)</li>
-                            <li>Almacenamiento de imágenes en base64</li>
-                        </ul>
-                        <br>
-                        <p>Además realizando modificaciones en proyecto de RRHH en Angular.</p>
-                        <div class="conectord">
-                            <div class="circulod"></div>
-                        </div>
-                    </div>
-                  
-                    <!--<div class="item der">
-                        <h4>Front Developer</h4>
-                        <span class="casa">Nombre de Compañía</span>
-                        <span class="fecha">2005 - 2008</span>
-                        <p>Lorem ipsum dolor sit amet consectetur, adipisicing elit. Quis, cumque repellat, tempora recusandae aliquam nemo esse natus impedit, nostrum temporibus veritatis eaque soluta aperiam id repudiandae fugiat deserunt! Explicabo, veritatis?</p>
-                        <div class="conectord">
-                            <div class="circulod"></div>
-                        </div>
-                    </div>
-                -->
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- SECCION PORTFOLIO -->
-   
-                
-             
-              
-           
- <section id="portfolio" class="portfolio">
-        <div class="contenido-seccion">
-            <h2 id="web">PORTFOLIO</h2>
-            <h3>Web</h3>
-            <div class="galeria">
-    <div id="carouselExampleInterval" class="carousel slide" data-bs-ride="carousel">
-        <div class="carousel-inner">
-          <div class="carousel-item active" data-bs-interval="10000">
-           <div class="proyecto">
-                    <img src="img/pizzablog.png" alt="" >
-                   <a href="https://cozy-fairy-b65f0e.netlify.app/" target="_blank"> <div class="overlay">
-                        <h3>HTML5 - CSS</h3>
-                        <p>Blog DePizza</p>
-                    </div>
-                </a>
-                </div>
-          </div>
-               
-          <div class="carousel-item" data-bs-interval="5000">
-           
-            <div class="proyecto">
-                <img src="img/rockfest.png" alt=""  >
-                <a href="https://monumental-dusk-22b199.netlify.app/" target="_blank"> <div class="overlay">
-                    <h3>HTML5 - SCSS - JS</h3>
-                    <p>Rock Fest</p>
-                </div>
-                </a>
-            </div>
-          </div>
-          <div class="carousel-item" data-bs-interval="5000">
-           
-            <div class="proyecto">
-                <img src="img/appsalon.png" alt=""  >
-                <a href="https://github.com/heviahxc/appsalon" target="_blank"> <div class="overlay">
-                    <h3>HTML5 - SASS - JS - PHP</h3>
-                    <p>App Salon</p>
-                </div>
-                </a>
-            </div>
-          </div>
-        </div>
-        <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleInterval" data-bs-slide="prev">
-          <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-          <span class="visually-hidden">Previous</span>
-        </button>
-        <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleInterval" data-bs-slide="next">
-          <span class="carousel-control-next-icon" aria-hidden="true"></span>
-          <span class="visually-hidden">Next</span>
-        </button>
+  <!-- ── HERO ── -->
+  <section id="inicio">
+    <div class="hero-inner">
+      <div class="hero-avatar">
+        <picture>
+          <source srcset="img/yo.webp" type="image/webp">
+          <source srcset="img/yo.jpg" type="image/jpeg">
+          <img src="img/yo.jpg" alt="Felipe Hevia" loading="lazy">
+        </picture>
+        <div class="status"></div>
       </div>
-
+      <div class="hero-badge"><i class="fa-solid fa-circle fa-beat" style="color:#22c55e;font-size:0.5rem;"></i> Disponible para trabajar</div>
+      <h1 class="hero-name">Felipe Hevia</h1>
+      <p class="hero-title">Ingeniero Informático · <span>Full Stack Developer</span> · Soporte N2</p>
+      <div class="hero-socials">
+        <a href="https://www.linkedin.com/in/felipe-hevia-611038211" target="_blank"><i class="fa-brands fa-linkedin-in"></i></a>
+        <a href="https://github.com/heviahxc" target="_blank"><i class="fa-brands fa-github"></i></a>
+        <a href="mailto:heviamc@gmail.com"><i class="fa-solid fa-envelope"></i></a>
+      </div>
+      <div class="hero-btns">
+        <a href="#sobremi" class="btn btn-primary"><i class="fa-solid fa-user" style="margin-right:8px;"></i> Sobre Mí</a>
+  
+         
+            <a id="download-button"
+   href="files/CV_FELIPE_HEVIA.pdf"
+   class="btn btn-primary"
+   download>
+   Descargar CV
+</a>
     </div>
-</div>
+    </div>
+  </section>
 
-    <br>
-
-    <div class="contenido-seccion">
-        <h3 id="movil">Movil</h3>
-        <div class="galeria">
-<div id="carouselExampleInterval" class="carousel slide" data-bs-ride="carousel">
-    <div class="carousel-inner">
-      <div class="carousel-item active" data-bs-interval="10000">
-           
-        <div class="proyectomovie">
-            <img src="img/movies.png" alt=""  >
-            <a href="https://github.com/heviahxc/peliculas" target="_blank"><div class="overlay">
-                <h3>Dart/Flutter</h3>
-                <p>App Movies</p>
-            </div>
-        </a>
+  <!-- ── SOBRE MÍ ── -->
+  <section id="sobremi">
+    <div class="section-title reveal">
+      <h2>Sobre Mí</h2>
+      <div class="title-line"></div>
+      <p class="subtitle">Un poco sobre quién soy</p>
+    </div>
+    <div class="about-grid">
+      <div class="about-card about-intro reveal">
+        <h3><i class="fa-solid fa-id-card"></i> Hola, soy Felipe</h3>
+        <p><span>Ingeniero Informático</span> titulado de la Universidad Católica del Maule, Chile. Tengo 24 años y programo desde los 16, cuando estudié Técnico en el Liceo Comercial Linares. Me apasiona el desarrollo de software, desde aplicaciones móviles hasta soluciones de soporte empresarial.</p>
+      </div>
+      <div class="about-card reveal">
+        <h3><i class="fa-solid fa-address-book"></i> Datos Personales</h3>
+        <ul class="data-list">
+          <li class="data-item">
+            <span class="data-label"><i class="fa-solid fa-phone"></i> Teléfono</span>
+            <span class="data-val">+569 9680 7573</span>
+          </li>
+          <li class="data-item">
+            <span class="data-label"><i class="fa-solid fa-envelope"></i> Email</span>
+            <span class="data-val"><a href="mailto:heviamc@gmail.com">heviamc@gmail.com</a></span>
+          </li>
+          <li class="data-item">
+            <span class="data-label"><i class="fa-solid fa-location-dot"></i> Ciudad</span>
+            <span class="data-val">Linares, Chile</span>
+          </li>
+          <li class="data-item">
+            <span class="data-label"><i class="fa-solid fa-briefcase"></i> Cargo</span>
+            <span class="data-val">Ing. Software · Soporte N2 · Full Stack</span>
+          </li>
+        </ul>
+      </div>
+      <div class="about-card reveal">
+        <h3><i class="fa-solid fa-heart"></i> Intereses</h3>
+        <div class="interests-grid">
+          <div class="interest-item"><i class="fa-solid fa-gamepad"></i><span>Juegos</span></div>
+          <div class="interest-item"><i class="fa-solid fa-headphones"></i><span>Música</span></div>
+          <div class="interest-item"><i class="fa-solid fa-plane"></i><span>Viajar</span></div>
+          <div class="interest-item"><i class="fa-solid fa-video"></i><span>Películas</span></div>
+          <div class="interest-item"><i class="fa-solid fa-person-hiking"></i><span>Deporte</span></div>
+          <div class="interest-item"><i class="fa-solid fa-book"></i><span>Libros</span></div>
+          <div class="interest-item"><i class="fa-solid fa-car"></i><span>Autos</span></div>
+          <div class="interest-item"><i class="fa-solid fa-camera"></i><span>Fotos</span></div>
         </div>
       </div>
+    </div>
+    <div style="text-align:center;margin-top:40px;" class="reveal">
+ 
+            <a id="download-button"
+   href="files/CV_FELIPE_HEVIA.pdf"
+   class="btn btn-primary"
+   download>
+   Descargar CV
+</a> </div>
+  </section>
 
+  <!-- ── SKILLS ── -->
+  <section id="skills">
+    <div class="section-title reveal">
+      <h2>Skills</h2>
+      <div class="title-line"></div>
+      <p class="subtitle">Tecnologías y habilidades que domino</p>
+    </div>
+    <div class="skills-grid">
+      <div class="skills-card reveal">
+        <h3><i class="fa-solid fa-code"></i> Technical Skills</h3>
+        <div class="skill-item">
+          <div class="skill-header"><span class="skill-name">HTML &amp; CSS</span><span class="skill-pct">80%</span></div>
+          <div class="skill-track"><div class="skill-fill" data-pct="80"></div></div>
+        </div>
+        <div class="skill-item">
+          <div class="skill-header"><span class="skill-name">Node.js</span><span class="skill-pct">80%</span></div>
+          <div class="skill-track"><div class="skill-fill" data-pct="80"></div></div>
+        </div>
+        <div class="skill-item">
+          <div class="skill-header"><span class="skill-name">SQL</span><span class="skill-pct">80%</span></div>
+          <div class="skill-track"><div class="skill-fill" data-pct="80"></div></div>
+        </div>
+        <div class="skill-item">
+          <div class="skill-header"><span class="skill-name">Flutter</span><span class="skill-pct">50%</span></div>
+          <div class="skill-track"><div class="skill-fill" data-pct="50"></div></div>
+        </div>
+        <div class="skill-item">
+          <div class="skill-header"><span class="skill-name">Angular</span><span class="skill-pct">40%</span></div>
+          <div class="skill-track"><div class="skill-fill" data-pct="40"></div></div>
+        </div>
+      </div>
+      <div class="skills-card reveal">
+        <h3><i class="fa-solid fa-people-group"></i> Professional Skills</h3>
+        <div class="skill-item">
+          <div class="skill-header"><span class="skill-name">Trabajo en Equipo</span><span class="skill-pct">90%</span></div>
+          <div class="skill-track"><div class="skill-fill" data-pct="90"></div></div>
+        </div>
+        <div class="skill-item">
+          <div class="skill-header"><span class="skill-name">Comunicación</span><span class="skill-pct">80%</span></div>
+          <div class="skill-track"><div class="skill-fill" data-pct="80"></div></div>
+        </div>
+        <div class="skill-item">
+          <div class="skill-header"><span class="skill-name">Creatividad</span><span class="skill-pct">80%</span></div>
+          <div class="skill-track"><div class="skill-fill" data-pct="80"></div></div>
+        </div>
+        <div class="skill-item">
+          <div class="skill-header"><span class="skill-name">Dedicación</span><span class="skill-pct">80%</span></div>
+          <div class="skill-track"><div class="skill-fill" data-pct="80"></div></div>
+        </div>
+        <div class="skill-item">
+          <div class="skill-header"><span class="skill-name">Project Management</span><span class="skill-pct">70%</span></div>
+          <div class="skill-track"><div class="skill-fill" data-pct="70"></div></div>
+        </div>
       </div>
     </div>
-            <!--
-    <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleInterval" data-bs-slide="prev">
-      <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-      <span class="visually-hidden">Previous</span>
-    </button>
-    <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleInterval" data-bs-slide="next">
-      <span class="carousel-control-next-icon" aria-hidden="true"></span>
-      <span class="visually-hidden">Next</span>
-    </button>
--->
-  </div>
+  </section>
 
-</div>
-</div>
-</section>
-
-
-
-
-    <!-- SECCION CONTACTO 
-    <section id="contacto" class="contacto">
-        <div class="contenido-seccion">
-            <h2>CONTACTO</h2>
-            <div class="fila">
-                 Formulario 
-                <div class="col">
-                    <input type="text" placeholder="Tú Nombre">
-                    <input type="text" placeholder="Número telefónico">
-                    <input type="text" placeholder="Dirección de correo">
-                    <input type="text" placeholder="Tema">
-                    <textarea name="" id="" cols="30" rows="10" placeholder="Mensaje"></textarea>
-                    <button>
-                        Enviar Mensaje<i class="fa-solid fa-paper-plane"></i>
-                        <span class="overlay"></span>
-                    </button>
-                </div>
-                Mapa 
-                <div class="col">
-                    <img src="img/ubicacion.png" alt="">
-                    <div class="info">
-                        <ul>
-                            <li>
-                                <i class="fa-solid fa-location-dot"></i>
-                                Nicaragua 159, San Rafael Mza
-                            </li>
-                            <li>
-                                <i class="fa-solid fa-mobile-screen"></i>
-                                Llamanos: 2384 - 4343443 
-                            </li>
-                            <li>
-                                <i class="fa-solid fa-envelope"></i>
-                                Email: cw@example.com
-                            </li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
+  <!-- ── CURRICULUM ── -->
+  <section id="curriculum">
+    <div class="section-title reveal">
+      <h2>Curriculum</h2>
+      <div class="title-line"></div>
+      <p class="subtitle">Mi trayectoria académica y profesional</p>
+    </div>
+    <div class="timeline-cols">
+      <!-- EDUCACIÓN -->
+      <div class="timeline-col reveal">
+        <h3><i class="fa-solid fa-graduation-cap"></i> Educación</h3>
+        <div class="timeline">
+          <div class="tl-item">
+            <div class="tl-date"><i class="fa-regular fa-calendar"></i> 2017 – 2019</div>
+            <div class="tl-title">Analista Programador</div>
+            <div class="tl-company">CFT San Agustín</div>
+            <p class="tl-desc">Portafolio de título en Java — software de manejo de inventario y préstamo de herramientas para Técnico en Obras Civiles.</p>
+            <div class="tl-tags"><span class="tag">Java</span><span class="tag">Desktop</span></div>
+          </div>
+          <div class="tl-item">
+            <div class="tl-date"><i class="fa-regular fa-calendar"></i> 2019 – 2021</div>
+            <div class="tl-title">Ingeniería en Informática</div>
+            <div class="tl-company">Universidad Católica del Maule</div>
+            <p class="tl-desc">Tesis en Matlab: software de procesamiento de imágenes para reducción de ruido y blurring, comparación de métodos mediante SNR.</p>
+            <div class="tl-tags"><span class="tag">Matlab</span><span class="tag">Procesamiento de Imágenes</span></div>
+          </div>
         </div>
-    </section>
--->
-    <!-- footer -->
-    <footer>
-        <a href="#inicio" class="arriba">
-            <i class="fa-solid fa-angles-up"></i>
-        </a>
-        <div class="redes">
-            <a href="https://www.linkedin.com/in/felipe-hevia-611038211" target="_blank"><i class="fa-brands fa-linkedin-in"></i></a>
-            <a href="https://github.com/heviahxc" target="_blank"><i class="fa-brands fa-github"></i></a>
+      </div>
+      <!-- EXPERIENCIA -->
+      <div class="timeline-col reveal">
+        <h3><i class="fa-solid fa-briefcase"></i> Experiencia</h3>
+        <div class="timeline">
+          <div class="tl-item">
+            <div class="tl-date"><i class="fa-regular fa-calendar"></i> Sep 2022 – Actual</div>
+            <div class="tl-title">Desarrollador Mobile</div>
+            <div class="tl-company">Grupo Firma</div>
+            <p class="tl-desc">Desarrollo en Android e iOS con Flutter, Node.js y MongoDB. Mapas con OpenStreetMap.</p>
+            <ul class="tl-list">
+              <li>Control de sesión de usuarios (tokens)</li>
+              <li>Almacenamiento de imágenes en base64</li>
+              <li>Modificaciones en proyecto RRHH Angular</li>
+            </ul>
+            <div class="tl-tags"><span class="tag">Flutter</span><span class="tag">Node.js</span><span class="tag">MongoDB</span><span class="tag">Angular</span></div>
+          </div>
+          <div class="tl-item">
+            <div class="tl-date"><i class="fa-regular fa-calendar"></i> May 2023 – Nov 2023</div>
+            <div class="tl-title">Ingeniero de Software</div>
+            <div class="tl-company">Abbi Spa</div>
+            <p class="tl-desc">Prestación de servicios a la Bolsa de Santiago como Ingeniero de Soporte y Mantención.</p>
+            <div class="tl-tags"><span class="tag">Soporte</span><span class="tag">Mantención</span></div>
+          </div>
+          <div class="tl-item">
+            <div class="tl-date"><i class="fa-regular fa-calendar"></i> Dic 2023 – Mar 2026</div>
+            <div class="tl-title">Ing. de Soporte y Mantención</div>
+            <div class="tl-company">Bolsa de Santiago Nuam</div>
+            <p class="tl-desc">Soporte a sistemas de la Bolsa, mantenimiento y resolución de incidencias, detección de errores en plataformas. Gestión de DTE y monitoreo de folios vencidos.</p>
+            <ul class="tl-list">
+              <li>Gestión de tickets con JIRA</li>
+              <li>Consultas y análisis en SQL Server</li>
+              <li>Monitoreo de Documentos Tributarios Electrónicos</li>
+            </ul>
+            <div class="tl-tags"><span class="tag">JIRA</span><span class="tag">SQL Server</span><span class="tag">DBeaver</span><span class="tag">DTE</span></div>
+          </div>
         </div>
-    </footer>
+      </div>
+    </div>
+  </section>
 
-    <script src="script.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ENjdO4Dr2bkBIFxQpeoTz1HIcje39Wm4jDKdf19U8gI4ddQ3GYNS7NTKfAdVQSZe" crossorigin="anonymous"></script>
+  <!-- ── PORTFOLIO ── -->
+  <section id="portfolio">
+    <div class="section-title reveal">
+      <h2>Portfolio</h2>
+      <div class="title-line"></div>
+      <p class="subtitle">Algunos de mis proyectos</p>
+    </div>
+    <div class="portfolio-tabs reveal">
+      <button class="tab-btn active" onclick="filterProjects('all', this)">Todos</button>
+      <button class="tab-btn" onclick="filterProjects('web', this)">Web</button>
+      <button class="tab-btn" onclick="filterProjects('movil', this)">Móvil</button>
+    </div>
+    <div class="portfolio-grid" id="portGrid">
+      <!-- Blog de Pizza -->
+      <div class="port-card" data-type="web">
+        <div class="port-img">
+          <img src="img/pizzablog.png" alt="Blog de Pizza" loading="lazy">
+          <div class="port-overlay">
+            <a href="https://cozy-fairy-b65f0e.netlify.app/" target="_blank"><i class="fa-solid fa-arrow-up-right-from-square"></i> Ver proyecto</a>
+          </div>
+        </div>
+        <div class="port-body">
+          <div class="port-tech"><span>HTML5</span><span>CSS</span></div>
+          <div class="port-title">Blog de Pizza</div>
+          <p class="port-desc">Diseño de landing page y blog para una pizzería, con estructura semántica y estilos modernos.</p>
+        </div>
+      </div>
+      <!-- Rock Fest -->
+      <div class="port-card" data-type="web">
+        <div class="port-img">
+          <img src="img/rockfest.png" alt="Rock Fest" loading="lazy">
+          <div class="port-overlay">
+            <a href="https://monumental-dusk-22b199.netlify.app/" target="_blank"><i class="fa-solid fa-arrow-up-right-from-square"></i> Ver proyecto</a>
+          </div>
+        </div>
+        <div class="port-body">
+          <div class="port-tech"><span>HTML5</span><span>SCSS</span><span>JS</span></div>
+          <div class="port-title">Rock Fest</div>
+          <p class="port-desc">Sitio web para un festival de música rock con animaciones CSS y diseño responsivo.</p>
+        </div>
+      </div>
+      <!-- App Salon -->
+      <div class="port-card" data-type="web">
+        <div class="port-img">
+          <img src="img/appsalon.png" alt="App Salon" loading="lazy">
+          <div class="port-overlay">
+            <a href="https://github.com/heviahxc/appsalon" target="_blank"><i class="fa-brands fa-github"></i> Ver código</a>
+          </div>
+        </div>
+        <div class="port-body">
+          <div class="port-tech"><span>HTML5</span><span>SASS</span><span>JS</span><span>PHP</span></div>
+          <div class="port-title">App Salon</div>
+          <p class="port-desc">Aplicación web para gestión de citas en salón de belleza, con backend en PHP.</p>
+        </div>
+      </div>
+      <!-- App Movies -->
+      <div class="port-card" data-type="movil">
+        <div class="port-img">
+          <img src="img/movies.png" alt="App Movies" loading="lazy" style="object-fit:contain;background:#111827;">
+          <div class="port-overlay">
+            <a href="https://github.com/heviahxc/peliculas" target="_blank"><i class="fa-brands fa-github"></i> Ver código</a>
+          </div>
+        </div>
+        <div class="port-body">
+          <div class="port-tech"><span>Dart</span><span>Flutter</span></div>
+          <div class="port-title">App Movies</div>
+          <p class="port-desc">Aplicación móvil para explorar películas con Flutter y Dart, integrada a una API de cine.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── FOOTER ── -->
+  <footer>
+    <p class="footer-copy">© 2026 <span>Felipe Hevia</span> · Diseñado con <i class="fa-solid fa-heart" style="color:#f43f5e;font-size:0.8rem;"></i></p>
+    <div class="footer-socials">
+      <a href="https://www.linkedin.com/in/felipe-hevia-611038211" target="_blank"><i class="fa-brands fa-linkedin-in"></i></a>
+      <a href="https://github.com/heviahxc" target="_blank"><i class="fa-brands fa-github"></i></a>
+      <a href="mailto:heviamc@gmail.com"><i class="fa-solid fa-envelope"></i></a>
+    </div>
+  </footer>
+
+  <!-- Scroll to top -->
+  <a href="#inicio" class="scroll-top" id="scrollTop"><i class="fa-solid fa-angles-up"></i></a>
+
+  <script>
+    /* ─── Navbar scroll ─── */
+    const navbar = document.getElementById('navbar');
+    const scrollTopBtn = document.getElementById('scrollTop');
+    window.addEventListener('scroll', () => {
+      navbar.classList.toggle('scrolled', window.scrollY > 50);
+      scrollTopBtn.classList.toggle('visible', window.scrollY > 400);
+    });
+
+    /* ─── Hamburger ─── */
+    function toggleMenu() {
+      document.getElementById('navLinks').classList.toggle('open');
+    }
+    function closeMenu() {
+      document.getElementById('navLinks').classList.remove('open');
+    }
+
+    /* ─── Reveal on scroll ─── */
+    const revealObserver = new IntersectionObserver((entries) => {
+      entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); } });
+    }, { threshold: 0.12 });
+    document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
+
+    /* ─── Skill bars ─── */
+    const skillObserver = new IntersectionObserver((entries) => {
+      entries.forEach(e => {
+        if (e.isIntersecting) {
+          e.target.querySelectorAll('.skill-fill').forEach(bar => {
+            bar.style.width = bar.dataset.pct + '%';
+          });
+          skillObserver.unobserve(e.target);
+        }
+      });
+    }, { threshold: 0.3 });
+    document.querySelectorAll('.skills-card').forEach(c => skillObserver.observe(c));
+
+    /* ─── Portfolio filter ─── */
+    function filterProjects(type, btn) {
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      document.querySelectorAll('.port-card').forEach(card => {
+        const show = type === 'all' || card.dataset.type === type;
+        card.style.display = show ? '' : 'none';
+      });
+    }
+  </script>
 </body>
 </html>

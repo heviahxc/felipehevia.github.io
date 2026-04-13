@@ -39,23 +39,11 @@ function efectoHabilidades(){
 window.onscroll = function(){
     efectoHabilidades();
 } 
-
 const downloadButton = document.getElementById('download-button');
 
-function downloadFile() {
-  fetch('/files/CV_FELIPE_HEVIA.pdf')
-    .then(response => response.blob())
-    .then(blob => {
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.style.display = 'none';
-      a.href = url;
-      a.download = 'CV_FELIPE_HEVIA.pdf';
-      document.body.appendChild(a);
-      a.click();
-      window.URL.revokeObjectURL(url);
-    });
-}
-
-downloadButton.addEventListener('click', downloadFile);
-
+downloadButton.addEventListener('click', () => {
+  const a = document.createElement('a');
+  a.href = 'files/CV_FELIPE_HEVIA.pdf'; // ruta correcta
+  a.download = 'CV_FELIPE_HEVIA.pdf';
+  a.click();
+});
